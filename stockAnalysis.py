@@ -57,7 +57,7 @@ def strategy2(symbol, startDate, endDate, maxMoney, params):
 	myPortfolio1 = portfolio(maxMoney)
 	
 	results = investmentResults()
-	print len(results.buyDates)
+	
 	#create the queue:
 	for i in range (0,S):
 		d = curDate - timedelta(days = S-i)
@@ -93,7 +93,7 @@ def strategy2(symbol, startDate, endDate, maxMoney, params):
 		
 		if ((myStockMarket.getCurSharePrice(symbol) <= qmin) & (daysSinceLastBuy > minBuyingPeriod)): #now we should buy
 			#myPortfolio1.printCurrentBalance()				
-			print "buying on "+str(curDate)	
+			#print "buying on "+str(curDate)	
 			myPortfolio1.buyInDollars(symbol, dollarsToBuy)
 			results.buyPrice.append(myStockMarket.getCurSharePrice(symbol))	
 			results.buyDates.append(curDate)
@@ -101,7 +101,7 @@ def strategy2(symbol, startDate, endDate, maxMoney, params):
 			
 		if ((myStockMarket.getCurSharePrice(symbol) == qmax) & (daysSinceLastSell > minSellingPeriod)): #now we should sell
 			#myPortfolio1.printCurrentBalance()				
-			print "selling on "+str(curDate)				
+			#print "selling on "+str(curDate)				
 			myPortfolio1.sellInDollars(symbol, dollarsToSell)
 			results.sellDates.append(curDate)				
 			results.sellPrice.append(myStockMarket.getCurSharePrice(symbol))	
@@ -123,74 +123,82 @@ def main():
 
 	# common parameters:	
 	symbol = 'spy'
-	startDate = parse('2011-10-01')
-	endDate = parse('2012-05-01')
+	startDate = parse('2006-01-01')
+	endDate = parse('2015-05-01')
 	maxMoney = 30000
-
-
-	###### STRATEGY 1: invest once every month, do not sell #######
 	
-	params1={}
-	params1['interval'] = 30 #days
-	params1['dollarsToBuy'] = 4000
+	while ((parse('2016-08-01') - startDate).days > 0):
 
-	result1 = strategy1(symbol, startDate, endDate, maxMoney, params1)
-	
-	plt.figure("Total Account Value")	
-	plt.plot(result1.allDates, result1.accountValuePlot)
-	#plt.show()
-
-	plt.figure("Total Invested Value")	
-	plt.plot(result1.allDates, result1.investedValuePlot)
-	
-	plt.figure("Buy and Sell Activity")
-	plt.plot(result1.allDates, result1.stockPricePlot, 'k-')
-	plt.plot(result1.buyDates, result1.buyPrice, 'o')
-	
-	#plt.show()
-
-	print "============================================================================================================"
-	
-
-	###### STRATEGY 2: buy at B-day minimum #######
-	#del myPortfolio.stock	
-	#del myPortfolio
-
-	params2 = {}
-	params2['B'] = 15
-	params2['S'] = 50
-	params2['minBuyingPeriod'] = 3
-	params2['minSellingPeriod'] = 10
-	params2['dollarsToBuy'] = 4000
-	params2['dollarsToSell'] = 5000
-	
-	result2 = strategy2(symbol, startDate, endDate, maxMoney, params2)
-	
-	print "loop done"
-	plt.figure("Total Account Value")	
-	plt.plot(result2.allDates, result2.accountValuePlot, 'r-')
-	plt.show()
-
-	plt.figure("Total Invested Value")	
-	plt.plot(result2.allDates, result2.investedValuePlot, 'r')
-	plt.show()
+		endDate = startDate + timedelta(days = 240) # eight months		
 		
-	plt.figure("Buy and Sell Activity")
-	plt.plot(result2.buyDates, result2.buyPrice, 'ro')
-	plt.plot(result2.sellDates, result2.sellPrice, 'r*', markersize=14)
-	plt.show()
-	#print "ARR1 = "+str(myPortfolio.computeARR())
-	#print "ARR2 = "+str(myPortfolio1.computeARR())
+		###### STRATEGY 1: invest once every month, do not sell #######
 	
-	#def getSharePriceArr(symbol, B):
-	#	sharePriceArr = []		
-	#	for i in range(0,B):
-	#		d = myStockMarket.curDate - timedelta(days=i) 
-	#		sharePriceArr.append(myStockMarket.getSharePrice(symbol, d)
-	#	return sharePriceArr
+		params1={}
+		params1['interval'] = 30 #days
+		params1['dollarsToBuy'] = 4000
+
+		result1 = strategy1(symbol, startDate, endDate, maxMoney, params1)
+	
+		
+	
+		#plt.show()
+
+		print "============================================================================================================"
+	
+
+		###### STRATEGY 2: buy at B-day minimum #######
+		#del myPortfolio.stock	
+		#del myPortfolio
+
+		params2 = {}
+		params2['B'] = 15
+		params2['S'] = 50
+		params2['minBuyingPeriod'] = 3
+		params2['minSellingPeriod'] = 10
+		params2['dollarsToBuy'] = 4000
+		params2['dollarsToSell'] = 5000
+	
+		result2 = strategy2(symbol, startDate, endDate, maxMoney, params2)
+	
+		####################
+
+
+		## plotting:
+		
+		plt.figure(figsize=(18.0, 15.0))
+		plt.subplot(221)	
+		plt.title("Total Account Value")	
+		plt.plot(result1.allDates, result1.accountValuePlot)
+		#plt.show()
+
+		plt.subplot(222)	
+		plt.title("Total Invested Value")	
+		plt.plot(result1.allDates, result1.investedValuePlot)
+	
+		plt.subplot(223)
+		plt.title("Buy and Sell Activity")
+		plt.plot(result1.allDates, result1.stockPricePlot, 'k-')
+		plt.plot(result1.buyDates, result1.buyPrice, 'o')
+
+
+		plt.subplot(221)
+		plt.plot(result2.allDates, result2.accountValuePlot, 'r-')
+	
+
+		plt.subplot(222)	
+		plt.plot(result2.allDates, result2.investedValuePlot, 'r')
 			
+		plt.subplot(223)
+		plt.plot(result2.buyDates, result2.buyPrice, 'ro')
+		plt.plot(result2.sellDates, result2.sellPrice, 'r*', markersize=14)
+		
+
+		plt.savefig('strategy1v2/'+str(startDate.date())+'.png')
+		
+		plt.close()
 
 
+		startDate = startDate + timedelta(days=30)
 
 	input("press any key ...")	
 	
